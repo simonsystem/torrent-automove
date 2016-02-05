@@ -4,7 +4,6 @@ import org.transdroid.daemon.task.*;
 import org.transdroid.daemon.Deluge.DelugeAdapter;
 import org.transdroid.daemon.util.*;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 import org.apache.http.params.HttpProtocolParams;
