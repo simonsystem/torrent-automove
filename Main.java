@@ -10,7 +10,6 @@ import org.apache.http.params.HttpParams;
 import org.apache.http.params.HttpProtocolParams;
 import org.apache.http.client.params.HttpClientParams;
 import org.transdroid.daemon.util.HttpHelper;
-import com.omertron.thetvdbapi.TheTVDBApi;
 import java.util.*;
 import org.apache.commons.lang3.StringUtils;
 import com.google.common.collect.*;
@@ -47,43 +46,37 @@ public class Main {
         return call(RetrieveTask.class, daemon, settings);
     }
 
-    public static abstract class ComparableInnerComparator<A, B extends Comparable<B>> implements Comparator<A> {
-        public int compare(A o1, A o2) {
-            return getKey(o1).compareTo(getKey(o2));
+    static class ParsedTorrent extends TreeMap<String, String> implements Comparable<ParsedTorrent> {
+        private final Torrent torrent;
+        ParsedTorrent(Torrent t) { torrent = t; }
+        public Torrent getTorrent() { return torrent; }
+        public int compareTo(ParsedTorrent o) {
+            return getTorrent().compareTo(o.getTorrent());
         }
-        public boolean equals(A o1, A o2) {
-            return compare(o1, o2) == 0;
-        }
-        public abstract B getKey(A a);
     }
     public static void main(String[] args) throws DaemonException {
         RetrieveTaskSuccessResult result = retrieve(d, s);
-        SortedSet<Map<String, String>> smap = new TreeSet<Map<String, String>>(
-            new ComparableInnerComparator<Map<String, String>, String>() {
-                public String getKey(Map<String, String> o) {
-                    return o.get("name") + (o.containsKey("show") ? o.get("episode") : "");
-                }
-            }
-        );
-        Map<String, String> release;
+        SortedSet<ParsedTorrent> torrents = new TreeSet();
+        ParsedTorrent release;
         ListMultimap<String, String> parsed;
         Lexer lexer;
         String key;
         for (Torrent t: result.getTorrents()) {
-            lexer = new Lexer(new StringReader(t.getName()));
+            lexer = new Lexer(new StringReader(t.getName() + "\n"));
             try {
                 parsed = lexer.yylex();
+                System.out.println(parsed);
             } catch (IOException e) {
-                parsed = null;
+                throw new Error(e);
             }
-            release = new TreeMap<String, String>();
+            release = new ParsedTorrent(t);
             for (Map.Entry<String, Collection<String>> e: parsed.asMap().entrySet()) {
                 release.put(e.getKey(), StringUtils.join(e.getValue(), " "));
             }
-            smap.add(release);
+            torrents.add(release);
         }
-        for (Map<String, String> e: smap) {
-            System.out.println(e.get("show") + " " + e.get("episode"));
+        for (ParsedTorrent e: torrents) {
+            System.out.println(e.get("name"));
         }
     }
 }

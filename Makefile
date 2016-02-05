@@ -7,6 +7,7 @@ JFLEX = jflex
 EMPTY = classes usedclasses
 
 .PHONY: %.jar $(EMPTY) lib
+.SECONDARY: Lexer.java
 
 $(EMPTY):
 	rm -Rf $@ && mkdir -p $@
@@ -30,7 +31,7 @@ extract: build classes
 torrent-automove.jar: extract
 	$(JAR) cfm torrent-automove.jar Manifest -C classes .
 torrent-automove-optimized.jar: extract usedclasses
-	cd classes && java -verbose:class Main 2>&1 | sed -n -e 's/\./\//g' -e 's/\[Loaded \(.*\) from file\:\/\/.*/\1.class/gp' | while read line; do cp --parents $$line ../usedclasses; done
+	cd classes && java -verbose:class Main 2>&1 | sed -n -e 's/\./\//g' -e 's/\[Loaded \(.*\) from file.*/\1.class/gp' | while read line; do cp --parents $$line ../usedclasses; done
 	$(JAR) cfm torrent-automove-optimized.jar Manifest -C usedclasses/ .
 
 clean:
