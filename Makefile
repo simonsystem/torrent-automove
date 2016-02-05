@@ -4,8 +4,8 @@ JAVA_ARGS = -cp .:./lib/*
 JAR = jar
 7Z = 7z
 JFLEX = jflex
-EMPTY = classes usedclasses
 
+EMPTY = classes usedclasses
 .PHONY: %.jar $(EMPTY) lib
 .SECONDARY: Lexer.java
 
@@ -36,5 +36,5 @@ torrent-automove-optimized.jar: extract usedclasses
 
 clean:
 	$(MAKE) -C lib clean
-	rm -Rf classes/ usedclasses/
+	rm -Rf classes/ usedclasses/ Lexer.java
 	find . -name '*.class' -exec rm -f {} \;

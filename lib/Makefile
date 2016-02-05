@@ -24,5 +24,5 @@ transdroid-2.5.5.jar: transdroid-2.5.5.apk
 	@$(DEX2JAR) -o $@ $< &&	7z d $@ org/transdroid/daemon/util/HttpHelper*
 
 clean:
-	find . -name '*.jar' -exec rm -f {} \;
+	find . \( -name '*.jar' -o -name '_*' \) -exec rm -f {} \;
 	rm -f transdroid-2.5.5.apk
